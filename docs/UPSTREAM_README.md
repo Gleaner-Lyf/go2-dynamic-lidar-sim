@@ -5,7 +5,7 @@
 ## Unitree Go2:
 <div style="display: flex; gap: 50px;">
   <img src="https://oss-global-cdn.unitree.com/static/c487f93e06954100a44fac4442b94d94_288x238.png" width="250" />
-  <img src=".docs/gz.png" width="350" /> 
+  <img src="../.docs/gz.png" width="350" />
 </div>
 
 > Unitree Robotics is focusing on the R&D, production, and sales of consumer and industry-class high-performance general-purpose legged and humanoid robots, six-axis manipulators, and so on. They attach great importance to independent research and development and technological innovation, fully self-researching key core robot components such as motors, reducers, controllers, LIDAR and high-performance perception and motion control algorithms, integrating the entire robotics industry chain.
@@ -16,7 +16,7 @@
 > CHAMP is an open source development framework for building new quadrupedal robots and developing new control algorithms. The control framework is based on [*"Hierarchical controller for highly dynamic locomotion utilizing pattern modulation and impedance control : implementation on the MIT Cheetah robot"*](https://dspace.mit.edu/handle/1721.1/85490).
 
 ## Resources:
-- [Go2 Description (URDF model)](https://github.com/unitreerobotics/unitree_ros/tree/master/robots/go2_description) 
+- [Go2 Description (URDF model)](https://github.com/unitreerobotics/unitree_ros/tree/master/robots/go2_description)
 - [CHAMP Robots (configs)](https://github.com/chvmp/robots)
 - [CHAMP Controller](https://github.com/chvmp/champ)
 - [Velodyne Simulator](https://github.com/rahgirrafi/velodyne_simulator_ros2_gz.git)
@@ -44,7 +44,7 @@
 ## 1. Installation
 
 ### 1.0 Clone the repository:
-    
+
 ```bash
 cd <your_ws>/src
 git clone https://github.com/rahgirrafi/unitree-go2-ros2.git
@@ -104,7 +104,7 @@ ros2 run teleop_twist_keyboard teleop_twist_keyboard
 ### 2.4 Velodyne 3D LiDAR Simulation
 Run the simulation with Velodyne VLP-16 3D LiDAR:
 ```bash
-ros2 launch go2_config gazebo_velodyne.launch.py 
+ros2 launch go2_config gazebo_velodyne.launch.py
 ```
 ![Go2 Velodyne Gazebo Launch](../.docs/velodyne.png)
 

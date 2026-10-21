@@ -45,7 +45,7 @@ sudo apt install git gh build-essential cmake python3-colcon-common-extensions \
 ```bash
 mkdir -p ~/go2_dynamic_ws/src
 cd ~/go2_dynamic_ws/src
-gh auth login --hostname github.com --git-protocol https --web
+gh auth login --hostname github.com --web
 gh auth setup-git
 gh repo clone "$(gh api user --jq .login)/go2-dynamic-lidar-sim" go2-dynamic-lidar-sim -- --recurse-submodules
 cd ~/go2_dynamic_ws
