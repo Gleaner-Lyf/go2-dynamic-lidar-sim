@@ -1,177 +1,112 @@
-# Unitree Go2 ROS 2 - CHAMP Controller
+> 本地整理版本：源码与验证已完成；GitHub 尚未登录，仓库尚未创建/推送。下列账号自解析克隆命令供登录并建仓后使用。
 
-> ROS 2 Humble package for the Unitree Go2 quadruped robot using the CHAMP controller framework with Ignition Fortress (Gazebo) simulation. Features teleoperation, 3D LiDAR (Velodyne), IMU, and 2D LiDAR support.
+# Go2 三维动态行人场景与 MID-360 近似雷达仿真
 
-## Unitree Go2:
-<div style="display: flex; gap: 50px;">
-  <img src="https://oss-global-cdn.unitree.com/static/c487f93e06954100a44fac4442b94d94_288x238.png" width="250" />
-  <img src=".docs/gz.png" width="350" /> 
-</div>
+基于 ROS2 Humble、Ignition Gazebo Fortress 和 CHAMP 的 Go2 仿真工程。场景包括地面、边界墙、内部墙、Go2、P1/P2/P3 三个动态行人，以及规则扫描的 MID-360 近似传感器。仓库地址：（尚待 GitHub 登录后创建私有仓库并写入真实 URL） 。本仓库为私有，克隆需要仓库访问权限。
 
-> Unitree Robotics is focusing on the R&D, production, and sales of consumer and industry-class high-performance general-purpose legged and humanoid robots, six-axis manipulators, and so on. They attach great importance to independent research and development and technological innovation, fully self-researching key core robot components such as motors, reducers, controllers, LIDAR and high-performance perception and motion control algorithms, integrating the entire robotics industry chain.
+已实测机器人前进、左右转向与停止，三个行人运动、两个关节控制器 active，以及 RViz 机器人和点云显示。当前实现不包含真实 MID-360 非重复扫描轨迹、逐点时间字段或 Unitree L1 仿真。
 
-## CHAMP Controller:
-![champ](https://raw.githubusercontent.com/chvmp/champ/master/docs/images/robots.gif)
+## 环境与验证范围
 
-> CHAMP is an open source development framework for building new quadrupedal robots and developing new control algorithms. The control framework is based on [*"Hierarchical controller for highly dynamic locomotion utilizing pattern modulation and impedance control : implementation on the MIT Cheetah robot"*](https://dspace.mit.edu/handle/1721.1/85490).
+- 已验证：Ubuntu 22.04.5、ROS2 Humble、Ignition Gazebo 6.18.0 / Fortress，Python 3.10、GCC 11。
+- 原工作空间实测：前进约 0.31 m；左转 43.7°、右转 76.8°；稳定后约 3 秒停止漂移 0.078 mm。转向伴随约 0.20～0.27 m 平移。
+- 干净检出、路径与独立运行验证结果见 [验证记录](docs/VALIDATION_zh.md)。没有在另一台电脑或全新 Ubuntu 安装上实测。
+- 软件渲染时，原机按现实时间统计的点云接收频率约 1.9～3.6 Hz，传感器配置频率为 10 Hz。频率比较受仿真推进速度、渲染和统计口径影响，未进一步测量前不能将其直接解释成丢帧。
 
-## Resources:
-- [Go2 Description (URDF model)](https://github.com/unitreerobotics/unitree_ros/tree/master/robots/go2_description) 
-- [CHAMP Robots (configs)](https://github.com/chvmp/robots)
-- [CHAMP Controller](https://github.com/chvmp/champ)
-- [Velodyne Simulator](https://github.com/rahgirrafi/velodyne_simulator_ros2_gz.git)
+## 快速复现
 
-## Tested on:
-- Ubuntu 22.04 (ROS 2 Humble)
-- Ignition Fortress (Gazebo)
+以下假设 Ubuntu 22.04 已配置 ROS2 Humble 软件源和可工作的 Humble / Fortress。完整步骤、依赖说明、预期结果、失败检查和正常退出见 [中文复现手册 A–N](docs/REPRODUCE_zh.md)。不要加载其他 ROS 发行版或 Gazebo Classic 工作空间。
 
-## Features:
-
-- ✅ Go2 robot configured with CHAMP controller
-- ✅ Robot description ported to ROS 2
-    - ✅ URDF with ros2_control tags
-    - ✅ Launch files for ROS 2
-    - ✅ Configuration files for ROS 2
-- ✅ Ignition Fortress simulation
-- ✅ RViz visualization
-- ✅ Teleoperation support
-- ✅ IMU sensor
-- ✅ 2D LiDAR (Hokuyo)
-- ✅ 3D LiDAR (Velodyne VLP-16)
-- ⬜ SLAM integration
-- ⬜ Nav2 integration
-
-## 1. Installation
-
-### 1.0 Clone the repository:
-    
-```bash
-cd <your_ws>/src
-git clone https://github.com/rahgirrafi/unitree-go2-ros2.git
-cd unitree-go2-ros2
-
-# Initialize and update the velodyne submodule
-git submodule update --init --recursive
-```
-
-> **Note:** The velodyne lidar package is included as a git submodule. If you've already cloned the repository without the `--recursive` flag, run `git submodule update --init --recursive` to fetch the submodule.
-
-### 1.1 Install dependencies using rosdep:
+终端 A：安装构建工具和本工程明确需要的系统包。sudo 仅用于安装依赖，不重装 ROS 或显卡驱动。
 
 ```bash
-# Install rosdep if not already installed
-sudo apt install -y python3-rosdep libignition-msgs8-dev
+source /opt/ros/humble/setup.bash
+sudo apt update
+sudo apt install git gh build-essential cmake python3-colcon-common-extensions \
+  python3-rosdep python3-vcstool libignition-gazebo6-dev \
+  libignition-plugin-dev libignition-sensors6-dev \
+  libignition-transport11-dev libignition-msgs8-dev \
+  ros-humble-ros-gz ros-humble-gz-ros2-control \
+  ros-humble-ros2-control ros-humble-ros2-controllers \
+  ros-humble-robot-localization ros-humble-diagnostic-updater \
+  ros-humble-rviz2 ros-humble-teleop-twist-keyboard
 
-# Initialize rosdep (only needed once)
-sudo rosdep init  # Skip if already initialized
+mkdir -p ~/go2_dynamic_ws/src
+cd ~/go2_dynamic_ws/src
+gh auth login --hostname github.com --git-protocol https --web
+gh auth setup-git
+gh repo clone "$(gh api user --jq .login)/go2-dynamic-lidar-sim" go2-dynamic-lidar-sim -- --recurse-submodules
+cd ~/go2_dynamic_ws
+
+# 旧软件源仍提供 diagnostic_updater 4.0.6 时，获取已固定提交的官方源码。
+if ! dpkg --compare-versions "$(dpkg-query -W -f='${Version}' ros-humble-diagnostic-updater)" ge 4.0.7; then
+  vcs import src < src/go2-dynamic-lidar-sim/dependencies.repos
+fi
+
+# 新机器只需 sudo rosdep init 一次；已初始化时跳过该命令。
+if [ ! -f /etc/ros/rosdep/sources.list.d/20-default.list ]; then
+  sudo rosdep init
+fi
 rosdep update
+mapfile -t GO2_PACKAGE_PATHS < <(colcon list --packages-up-to go2_config champ_teleop --paths-only)
+rosdep install --from-paths "${GO2_PACKAGE_PATHS[@]}" --ignore-src --rosdistro humble -y \
+  --skip-keys 'libignition-gazebo6-dev libignition-plugin1-dev libignition-sensors6-dev libignition-transport11-dev libignition-msgs8-dev'
 
-# Install all dependencies
-cd <your_ws>
-rosdep install --from-paths src --ignore-src -r -y
+colcon build --packages-up-to go2_config champ_teleop \
+  --allow-overriding diagnostic_updater --symlink-install --parallel-workers 2 \
+  --cmake-args -DBUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=RelWithDebInfo
+source install/setup.bash
+./src/go2-dynamic-lidar-sim/scripts/audit_resources.py
+./src/go2-dynamic-lidar-sim/scripts/start_sim.sh
 ```
 
-### 1.2 Build your workspace:
+若出现原机曾遇到的驱动初始化失败、白屏或第一帧停滞，退出此次启动后改用：
+
 ```bash
-cd <your_ws>
-colcon build
-. <your_ws>/install/setup.bash
+./src/go2-dynamic-lidar-sim/scripts/start_sim.sh --software-rendering
 ```
-## 2. Quick Start
 
-You don't need a physical robot to run the following demos. All dependencies will be installed via rosdep.
+此选项设置 `LIBGL_ALWAYS_SOFTWARE=1`，使用 CPU 软件渲染，可能明显降低仿真和点云的现实时间速率。其他机器优先使用正常渲染，无需默认启用它。完整启动等价于：
 
-### 2.1 Basic Simulation
-Run the Ignition Fortress simulation:
 ```bash
-ros2 launch go2_config gazebo.launch.py
+ros2 launch go2_config gazebo_mid360.launch.py \
+  world_init_z:=0.275 mid360_bridge:=true rviz:=true gui:=true headless:=False
 ```
-![Go2 Gazebo Launch](.docs/gz.png)
 
-### 2.2 Simulation with RViz
-Run the simulation with RViz visualization:
+终端 B：仿真启动并保持终端 A 运行后，打开新终端控制机器人：
+
 ```bash
-ros2 launch go2_config gazebo.launch.py rviz:=true
-```
-![Go2 Gazebo RViz Launch](.docs/gz_rviz.png)
-
-### 2.3 Teleoperation
-Control the robot using keyboard:
-```bash
-ros2 run teleop_twist_keyboard teleop_twist_keyboard
+source /opt/ros/humble/setup.bash
+source ~/go2_dynamic_ws/install/setup.bash
+ros2 run teleop_twist_keyboard teleop_twist_keyboard \
+  --ros-args -p speed:=0.12 -p turn:=0.3
 ```
 
-### 2.4 Velodyne 3D LiDAR Simulation
-Run the simulation with Velodyne VLP-16 3D LiDAR:
-```bash
-ros2 launch go2_config gazebo_velodyne.launch.py 
-```
-![Go2 Velodyne Gazebo Launch](.docs/velodyne.png)
+输入焦点应在终端 B，使用英文输入法。`i` 前进、`,` 后退、`j/l` 左右转、`u/o` 边前进边转；**`k` 或空格停止**。当前标准键盘节点松开按键不会自动停止。按 `k` 后再 `Ctrl+C` 退出键盘；最后在终端 A `Ctrl+C` 关闭仿真。
 
-### 2.5 Velodyne with RViz Point Cloud
-Run the Velodyne simulation with RViz to visualize point cloud data:
-```bash
-ros2 launch go2_config gazebo_velodyne.launch.py rviz:=true
-```
+## 目录和来源
 
-> **Note:** Set point cloud topic to `/velodyne_points` in RViz.
+保留上游多 ROS 包结构、Git 历史和固定版本 Velodyne 子模块；目标场景所需的自定义内容均在此仓库，无其他个人工作空间依赖。
 
-![Go2 Velodyne Gazebo RViz Launch](.docs/velodyne_rviz_pcl.png)
+| 目录 | 内容 |
+|---|---|
+| `champ/` | CHAMP 控制、状态估计、Gazebo 启动、完整行人插件源码 |
+| `robots/descriptions/go2_description/` | Go2 URDF/Xacro、DAE、碰撞、惯性、关节、MID-360 模型 |
+| `robots/configs/go2_config/` | 动态场景、P1 OBJ/MTL、launch、控制配置、RViz |
+| `velodyne/` | 固定提交的上游子模块 |
+| `champ_teleop/` | 上游遥控包 |
+| `scripts/` | 启动、检查、停止脚本 |
+| `docs/` | 复现、结构、验证、上游原 README |
+| `dependencies.repos` | 旧系统诊断库的官方源码备选 |
 
-### 2.6 Hokuyo 2D LiDAR Configuration
+上游是 [rahgirrafi/unitree-go2-ros2](https://github.com/rahgirrafi/unitree-go2-ros2) 的 `ignition` 分支，基线 `5580296`。自定义工作包括动态行人场景、基于力的行人路径插件、P1 静态人形、MID-360 近似模型及桥接、RViz 配置；本次发布整理加入可移植路径、依赖声明、检查脚本和中文文档，没有更改步态算法和雷达数值参数。
 
-To use a 2D laser scanner instead of the 3D Velodyne LiDAR:
+三维资源随 ROS 包安装，SDF 基础几何体完整保留；P1 OBJ→MTL、Go2 DAE 引用由资源检查脚本递归检查。单个最大文件约 10.7 MB，当前不使用 Git LFS。无需单独下载运行时模型。许可证和来源见 [第三方说明](THIRD_PARTY_NOTICES.md)，上游原始说明见 [UPSTREAM_README](docs/UPSTREAM_README.md)。上游其他示例世界不属于本项目已验证入口。
 
-1. Open `robots/descriptions/go2_description/xacro/robot_VLP.xacro`
-2. Comment out: `<xacro:include filename="$(find go2_description)/xacro/velodyne.xacro"/>`
-3. Uncomment: `<xacro:include filename="$(find go2_description)/xacro/laser.xacro"/>`
-4. Rebuild the workspace
+## 数据链路和限制
 
-Then launch:
-```bash
-ros2 launch go2_config gazebo_velodyne.launch.py rviz:=true
-```
+键盘 `/cmd_vel` → CHAMP → 关节轨迹控制 → Gazebo Go2；行人插件控制三个物理模型；Ogre2 `gpu_lidar` 对场景生成点云 → `ros_gz_bridge` → `/mid360/points` → RViz。详细图示、话题与坐标系见 [工程结构](docs/ARCHITECTURE_zh.md)。
 
-## 3. Tuning Gait Parameters
+MID-360 近似参数：水平 720 点 / 360°，垂直 40 层 / 约 −7°～52°，距离 0.10～40 m，距离分辨率 0.01 m，高斯噪声标准差 0.01 m，配置频率 10 Hz。安装于 `trunk` 的 `(0.10,0,0.09)` m；点云类型 `sensor_msgs/msg/PointCloud2`、frame=`mid360_link`，字段 x/y/z/intensity/ring，无逐点时间。
 
-The gait configuration for your robot can be found in `go2_config/config/gait/gait.yaml`.
-
-![CHAMP Setup Assistant](https://raw.githubusercontent.com/chvmp/champ_setup_assistant/master/docs/images/gait_parameters.png)
-
-| Parameter | Unit | Description |
-|-----------|------|-------------|
-| **Knee Orientation** | - | How the knees should be bent. Configure as `.>>` `.><` `.<<` `.<>` where dot is the front of the robot. |
-| **Max Linear Velocity X** | m/s | Robot's maximum forward/reverse speed. |
-| **Max Linear Velocity Y** | m/s | Robot's maximum speed when moving sideways. |
-| **Max Angular Velocity Z** | rad/s | Robot's maximum rotational speed. |
-| **Stance Duration** | s | How long each leg spends on the ground while walking. Default: 0.25s. |
-| **Leg Swing Height** | m | Trajectory height during swing phase. |
-| **Leg Stance Height** | m | Trajectory depth during stance phase. |
-| **Robot Walking Height** | m | Distance from hip to ground while walking. Setting too high can cause instability. |
-| **CoM X Translation** | m | Shift reference point in X axis to compensate for uneven weight distribution. |
-| **Odometry Scaler** | - | Multiplier for dead reckoning velocities. Typically 1.0 to 1.20. |
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'feat: Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## License
-
-This project is open source. See individual package licenses for details.
-
-## Acknowledgements
-
-This project builds upon and incorporates work from the following projects:
-
-* [Unitree Robotics](https://github.com/unitreerobotics/unitree_ros) - Go2 robot description (URDF model)
-* [CHAMP](https://github.com/chvmp/champ) - Quadruped controller framework
-* [CHAMP Robots](https://github.com/chvmp/robots) - Robot configurations and setup examples
-* [Velodyne Simulator](https://github.com/rahgirrafi/velodyne_simulator_ros2_gz.git) - Velodyne LiDAR simulation for Ignition Fortress
-
-We are grateful to the developers and contributors of these projects for their valuable work.
+已知限制：转向伴随平移；软件渲染速度受 CPU 与并发负载影响；P1 没有骨骼步行动画；雷达为规则网格近似；通用 `/imu/data` 桥接没有对齐当前模型的原生 IMU 话题；导航、SLAM、真实硬件、其他 ROS/Gazebo 版本和其他电脑未验证。排查方法见复现手册。

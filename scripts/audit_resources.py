@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 """Check the installed dynamic scene's transitive local model references."""
 import json
 from pathlib import Path

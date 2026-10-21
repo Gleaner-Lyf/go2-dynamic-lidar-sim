@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 """Read-only check: point clouds, clock, joints, odometry and pedestrian poses."""
 import argparse
 import json
