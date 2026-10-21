@@ -1,0 +1,609 @@
+<?xml version="1.0" ?>
+<sdf version="1.8">
+  <world name="dynamic_obstacles_p1">
+
+    <!-- Physics -->
+    <physics name="default_physics" type="ode">
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1</real_time_factor>
+      <real_time_update_rate>1000</real_time_update_rate>
+    </physics>
+
+    <!-- Plugins required for Ignition Gazebo -->
+    <plugin filename="ignition-gazebo-physics-system" name="ignition::gazebo::systems::Physics"/>
+    <plugin filename="ignition-gazebo-user-commands-system" name="ignition::gazebo::systems::UserCommands"/>
+    <plugin filename="ignition-gazebo-scene-broadcaster-system" name="ignition::gazebo::systems::SceneBroadcaster"/>
+    <plugin filename="ignition-gazebo-sensors-system" name="ignition::gazebo::systems::Sensors">
+      <render_engine>ogre2</render_engine>
+    </plugin>
+    <plugin filename="ignition-gazebo-imu-system" name="ignition::gazebo::systems::Imu"/>
+    <plugin filename="ignition-gazebo-contact-system" name="ignition::gazebo::systems::Contact"/>
+
+    <!-- Lighting - simplified for better compatibility -->
+    <light name="sun" type="directional">
+      <cast_shadows>false</cast_shadows>
+      <pose>0 0 10 0 0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.1 0.1 0.1 1</specular>
+      <direction>-0.5 0.5 -1</direction>
+    </light>
+
+    <!-- Ground Plane -->
+    <model name="ground_plane">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>100 100</size>
+            </plane>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>100</mu>
+                <mu2>50</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <cast_shadows>false</cast_shadows>
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>100 100</size>
+            </plane>
+          </geometry>
+          <material>
+            <ambient>0.8 0.8 0.8 1</ambient>
+            <diffuse>0.8 0.8 0.8 1</diffuse>
+            <specular>0.8 0.8 0.8 1</specular>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Boundary walls -->
+    <model name="boundary_wall_south">
+      <pose>0 -4.0 0.6 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>12.2 0.2 1.2</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>12.2 0.2 1.2</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.75 0.75 0.75 1</ambient>
+            <diffuse>0.75 0.75 0.75 1</diffuse>
+            <specular>0.2 0.2 0.2 1</specular>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="boundary_wall_north">
+      <pose>0 4.0 0.6 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>12.2 0.2 1.2</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>12.2 0.2 1.2</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.75 0.75 0.75 1</ambient>
+            <diffuse>0.75 0.75 0.75 1</diffuse>
+            <specular>0.2 0.2 0.2 1</specular>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="boundary_wall_west">
+      <pose>-6.0 0 0.6 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>0.2 8.2 1.2</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.2 8.2 1.2</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.75 0.75 0.75 1</ambient>
+            <diffuse>0.75 0.75 0.75 1</diffuse>
+            <specular>0.2 0.2 0.2 1</specular>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="boundary_wall_east">
+      <pose>6.0 0 0.6 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>0.2 8.2 1.2</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.2 8.2 1.2</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.75 0.75 0.75 1</ambient>
+            <diffuse>0.75 0.75 0.75 1</diffuse>
+            <specular>0.2 0.2 0.2 1</specular>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Internal walls -->
+    <model name="wall_w1_vertical">
+      <pose>-1.8 1.0 0.6 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>0.2 3.0 1.2</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.2 3.0 1.2</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.55 0.75 0.95 1</ambient>
+            <diffuse>0.55 0.75 0.95 1</diffuse>
+            <specular>0.2 0.2 0.2 1</specular>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="wall_w2_horizontal">
+      <pose>1.2 -1.4 0.6 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>4.0 0.2 1.2</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>4.0 0.2 1.2</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.95 0.72 0.45 1</ambient>
+            <diffuse>0.95 0.72 0.45 1</diffuse>
+            <specular>0.2 0.2 0.2 1</specular>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="wall_w3_occlusion">
+      <pose>3.6 1.5 0.6 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>0.2 2.2 1.2</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.2 2.2 1.2</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.95 0.55 0.55 1</ambient>
+            <diffuse>0.95 0.55 0.55 1</diffuse>
+            <specular>0.2 0.2 0.2 1</specular>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Visual-only markers -->
+    <model name="goal_marker">
+      <pose>5.0 3.0 0.011 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <visual name="visual">
+          <geometry>
+            <cylinder>
+              <radius>0.30</radius>
+              <length>0.02</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.05 0.8 0.2 1</ambient>
+            <diffuse>0.05 0.8 0.2 1</diffuse>
+            <specular>0.1 0.1 0.1 1</specular>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- P1 crossing obstacle endpoint markers -->
+    <model name="p1_marker_a">
+      <pose>-5.0 -2.25 0.011 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <visual name="visual">
+          <geometry>
+            <cylinder>
+              <radius>0.15</radius>
+              <length>0.02</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>1.0 0.9 0.05 1</ambient>
+            <diffuse>1.0 0.9 0.05 1</diffuse>
+            <specular>0.1 0.1 0.1 1</specular>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="p1_marker_b">
+      <pose>-1.5 -2.25 0.011 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <visual name="visual">
+          <geometry>
+            <cylinder>
+              <radius>0.15</radius>
+              <length>0.02</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>1.0 0.9 0.05 1</ambient>
+            <diffuse>1.0 0.9 0.05 1</diffuse>
+            <specular>0.1 0.1 0.1 1</specular>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- P2 head-on obstacle endpoint markers -->
+    <model name="p2_marker_a">
+      <pose>-3.0 2.5 0.011 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <visual name="visual">
+          <geometry>
+            <cylinder>
+              <radius>0.15</radius>
+              <length>0.02</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.1 0.9 1.0 1</ambient>
+            <diffuse>0.1 0.9 1.0 1</diffuse>
+            <specular>0.1 0.1 0.1 1</specular>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="p2_marker_b">
+      <pose>-3.0 -0.5 0.011 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <visual name="visual">
+          <geometry>
+            <cylinder>
+              <radius>0.15</radius>
+              <length>0.02</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.1 0.9 1.0 1</ambient>
+            <diffuse>0.1 0.9 1.0 1</diffuse>
+            <specular>0.1 0.1 0.1 1</specular>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Simplified dynamic pedestrian prototype -->
+    <model name="pedestrian_p1">
+      <pose>-5.0 -2.25 0.25 0 0 0</pose>
+      <static>false</static>
+      <link name="body_link">
+        <inertial>
+          <inertia>
+            <ixx>0.16666</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.16666</iyy>
+            <iyz>0</iyz>
+            <izz>0.16666</izz>
+          </inertia>
+          <mass>1.0</mass>
+        </inertial>
+        <collision name="body_collision">
+          <geometry>
+            <box>
+              <size>0.50 0.50 0.50</size>
+            </box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.10</mu>
+                <mu2>0.10</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="p1_human_visual">
+          <pose>0 0 -0.25 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>../meshes/pedestrians/p1_human_baked.obj</uri>
+              <scale>1.008360451146 1.008360451146 1.008360451146</scale>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <plugin filename="libPedestrianPathController.so" name="champ_gazebo::PedestrianPathController">
+        <link_name>body_link</link_name>
+        <point_a>-5.0 -2.25</point_a>
+        <point_b>-1.5 -2.25</point_b>
+        <loop>true</loop>
+        <cruise_speed>0.8</cruise_speed>
+        <max_force>8</max_force>
+        <max_torque>10</max_torque>
+        <velocity_gain>8</velocity_gain>
+        <lateral_gain>2.5</lateral_gain>
+        <max_lateral_speed>0.45</max_lateral_speed>
+        <yaw_gain>8</yaw_gain>
+        <yaw_rate_gain>2</yaw_rate_gain>
+        <endpoint_tolerance>0.12</endpoint_tolerance>
+        <blocked_speed_threshold>0.08</blocked_speed_threshold>
+        <blocked_timeout>0.5</blocked_timeout>
+        <blocked_force_scale>0.1</blocked_force_scale>
+        <recovery_probe_interval>1.0</recovery_probe_interval>
+        <recovery_ramp_time>1.0</recovery_ramp_time>
+        <recovery_timeout>2.0</recovery_timeout>
+        <recovery_speed_threshold>0.25</recovery_speed_threshold>
+        <debug>true</debug>
+      </plugin>
+    </model>
+
+    <model name="pedestrian_p2">
+      <pose>-3.0 2.5 0.25 0 0 -1.5708</pose>
+      <static>false</static>
+      <link name="body_link">
+        <inertial>
+          <inertia>
+            <ixx>0.16666</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.16666</iyy>
+            <iyz>0</iyz>
+            <izz>0.16666</izz>
+          </inertia>
+          <mass>1.0</mass>
+        </inertial>
+        <collision name="p2_body_collision">
+          <geometry>
+            <box>
+              <size>0.50 0.50 0.50</size>
+            </box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.10</mu>
+                <mu2>0.10</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="p2_body_visual">
+          <pose>0 0 0.40 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.24</radius>
+              <length>1.30</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.75 0.2 0.95 1</ambient>
+            <diffuse>0.75 0.2 0.95 1</diffuse>
+            <specular>0.2 0.2 0.2 1</specular>
+          </material>
+        </visual>
+        <visual name="p2_head_visual">
+          <pose>0 0 1.25 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.20</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <ambient>0.95 0.85 0.25 1</ambient>
+            <diffuse>0.95 0.85 0.25 1</diffuse>
+            <specular>0.2 0.2 0.2 1</specular>
+          </material>
+        </visual>
+      </link>
+      <plugin filename="libPedestrianPathController.so" name="champ_gazebo::PedestrianPathController">
+        <link_name>body_link</link_name>
+        <point_a>-3.0 2.5</point_a>
+        <point_b>-3.0 -0.5</point_b>
+        <loop>true</loop>
+        <cruise_speed>0.8</cruise_speed>
+        <max_force>8</max_force>
+        <max_torque>10</max_torque>
+        <velocity_gain>8</velocity_gain>
+        <lateral_gain>2.5</lateral_gain>
+        <max_lateral_speed>0.45</max_lateral_speed>
+        <yaw_gain>8</yaw_gain>
+        <yaw_rate_gain>2</yaw_rate_gain>
+        <endpoint_tolerance>0.12</endpoint_tolerance>
+        <blocked_speed_threshold>0.08</blocked_speed_threshold>
+        <blocked_timeout>0.5</blocked_timeout>
+        <blocked_force_scale>0.1</blocked_force_scale>
+        <recovery_probe_interval>1.0</recovery_probe_interval>
+        <recovery_ramp_time>1.0</recovery_ramp_time>
+        <recovery_timeout>2.0</recovery_timeout>
+        <recovery_speed_threshold>0.25</recovery_speed_threshold>
+        <debug>true</debug>
+      </plugin>
+    </model>
+
+    <model name="pedestrian_p3">
+      <pose>4.3 0.0 0.25 0 0 0</pose>
+      <static>false</static>
+      <link name="body_link">
+        <inertial>
+          <inertia>
+            <ixx>0.16666</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.16666</iyy>
+            <iyz>0</iyz>
+            <izz>0.16666</izz>
+          </inertia>
+          <mass>1.0</mass>
+        </inertial>
+        <collision name="body_collision">
+          <geometry>
+            <box>
+              <size>0.50 0.50 0.50</size>
+            </box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.10</mu>
+                <mu2>0.10</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="body_visual">
+          <pose>0 0 0.40 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.24</radius>
+              <length>1.30</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.75 0.2 0.95 1</ambient>
+            <diffuse>0.75 0.2 0.95 1</diffuse>
+            <specular>0.2 0.2 0.2 1</specular>
+          </material>
+        </visual>
+        <visual name="head_visual">
+          <pose>0 0 1.25 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.20</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <ambient>0.95 0.85 0.25 1</ambient>
+            <diffuse>0.95 0.85 0.25 1</diffuse>
+            <specular>0.2 0.2 0.2 1</specular>
+          </material>
+        </visual>
+      </link>
+      <plugin filename="libPedestrianPathController.so" name="champ_gazebo::PedestrianPathController">
+        <link_name>body_link</link_name>
+        <point_a>4.3 0.0</point_a>
+        <point_b>4.3 2.8</point_b>
+        <loop>true</loop>
+        <cruise_speed>0.8</cruise_speed>
+        <max_force>8</max_force>
+        <max_torque>10</max_torque>
+        <velocity_gain>8</velocity_gain>
+        <lateral_gain>2.5</lateral_gain>
+        <max_lateral_speed>0.45</max_lateral_speed>
+        <yaw_gain>8</yaw_gain>
+        <yaw_rate_gain>2</yaw_rate_gain>
+        <endpoint_tolerance>0.12</endpoint_tolerance>
+        <blocked_speed_threshold>0.08</blocked_speed_threshold>
+        <blocked_timeout>0.5</blocked_timeout>
+        <blocked_force_scale>0.1</blocked_force_scale>
+        <recovery_probe_interval>1.0</recovery_probe_interval>
+        <recovery_ramp_time>1.0</recovery_ramp_time>
+        <recovery_timeout>2.0</recovery_timeout>
+        <recovery_speed_threshold>0.25</recovery_speed_threshold>
+        <debug>true</debug>
+      </plugin>
+    </model>
+
+    <!-- Scene settings -->
+    <scene>
+      <ambient>0.6 0.6 0.6 1</ambient>
+      <background>0.7 0.7 0.7 1</background>
+      <shadows>false</shadows>
+    </scene>
+
+    <!-- Gravity -->
+    <gravity>0 0 -9.8</gravity>
+    <magnetic_field>6e-06 2.3e-05 -4.2e-05</magnetic_field>
+    <atmosphere type="adiabatic"/>
+
+    <!-- Spherical coordinates -->
+    <spherical_coordinates>
+      <surface_model>EARTH_WGS84</surface_model>
+      <latitude_deg>0</latitude_deg>
+      <longitude_deg>0</longitude_deg>
+      <elevation>0</elevation>
+      <heading_deg>0</heading_deg>
+    </spherical_coordinates>
+
+  </world>
+</sdf>

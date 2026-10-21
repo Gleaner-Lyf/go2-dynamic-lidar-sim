@@ -1,0 +1,30 @@
+newmtl eyes-white
+Kd 0.95 0.95 0.9
+Ka 0.57 0.57 0.54
+Ks 0.1 0.1 0.1
+
+newmtl eyes-brown
+Kd 0.3 0.16 0.08
+Ka 0.18 0.096 0.048
+Ks 0.1 0.1 0.1
+
+newmtl eyes-black
+Kd 0.02 0.02 0.02
+Ka 0.012 0.012 0.012
+Ks 0.1 0.1 0.1
+
+newmtl skin-mat
+Kd 0.72 0.48 0.32
+Ka 0.432 0.288 0.192
+Ks 0.1 0.1 0.1
+
+newmtl sweater-green
+Kd 0.05 0.42 0.2
+Ka 0.03 0.252 0.12
+Ks 0.1 0.1 0.1
+
+newmtl jeans-blue
+Kd 0.05 0.1 0.45
+Ka 0.03 0.06 0.27
+Ks 0.1 0.1 0.1
+

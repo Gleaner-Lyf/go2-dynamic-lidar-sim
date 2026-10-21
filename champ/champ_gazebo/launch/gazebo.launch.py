@@ -1,7 +1,7 @@
 import os
 
 import launch_ros
-from ament_index_python.packages import get_package_share_directory
+from ament_index_python.packages import get_package_share_directory, get_package_prefix
 from launch_ros.actions import Node
 
 from launch import LaunchDescription
@@ -11,7 +11,7 @@ from launch.actions import (DeclareLaunchArgument, ExecuteProcess,
 from launch.conditions import IfCondition
 from launch.event_handlers import OnProcessExit
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import Command, LaunchConfiguration, PythonExpression, PathJoinSubstitution
+from launch.substitutions import Command, LaunchConfiguration, PythonExpression, PathJoinSubstitution, EnvironmentVariable
 
 
 def generate_launch_description():
@@ -20,6 +20,7 @@ def generate_launch_description():
     robot_name = LaunchConfiguration("robot_name")
     use_sim_time = LaunchConfiguration("use_sim_time")
     headless = LaunchConfiguration("headless")
+    gui = LaunchConfiguration("gui")
     ros_control_file = LaunchConfiguration("ros_control_file")
     world_init_x = LaunchConfiguration("world_init_x")
     world_init_y = LaunchConfiguration("world_init_y")
@@ -35,6 +36,7 @@ def generate_launch_description():
     declare_robot_name = DeclareLaunchArgument("robot_name", default_value="go2")
     declare_use_sim_time = DeclareLaunchArgument("use_sim_time", default_value="True")
     declare_headless = DeclareLaunchArgument("headless", default_value="False")
+    declare_gui = DeclareLaunchArgument("gui", default_value="true")
     declare_skip_robot_state_publisher = DeclareLaunchArgument(
         "skip_robot_state_publisher", default_value="False",
         description="Skip robot_state_publisher if already launched elsewhere"
@@ -74,8 +76,23 @@ def generate_launch_description():
         value=[
             os.path.join(gz_pkg_share, 'worlds'), ':',
             os.path.join(gz_pkg_share, 'models'), ':',
-            '/usr/share/ignition/ignition-gazebo6/worlds'
+            '/usr/share/ignition/ignition-gazebo6/worlds', ':',
+            EnvironmentVariable('IGN_GAZEBO_RESOURCE_PATH', default_value='')
         ]
+    )
+
+    # Find installed plugins via the selected workspace, without machine-specific paths.
+    plugin_dirs = ':'.join([
+        os.path.join(get_package_prefix('champ_gazebo'), 'lib'),
+        os.path.join(get_package_prefix('gz_ros2_control'), 'lib'),
+    ])
+    ign_plugin_path = SetEnvironmentVariable(
+        'IGN_GAZEBO_SYSTEM_PLUGIN_PATH',
+        [plugin_dirs, ':', EnvironmentVariable('IGN_GAZEBO_SYSTEM_PLUGIN_PATH', default_value='')],
+    )
+    gz_plugin_path = SetEnvironmentVariable(
+        'GZ_SIM_SYSTEM_PLUGIN_PATH',
+        [plugin_dirs, ':', EnvironmentVariable('GZ_SIM_SYSTEM_PLUGIN_PATH', default_value='')],
     )
 
     # Start Ignition Gazebo with the world file
@@ -84,13 +101,13 @@ def generate_launch_description():
         cmd=['ign', 'gazebo', '-r', gazebo_world,
              '--render-engine', 'ogre2'],
         output='screen',
-        condition=IfCondition(PythonExpression(['not ', headless])),
+        condition=IfCondition(PythonExpression(['not ', headless, " and '", gui, "'.lower() == 'true'"])),
     )
     
     start_ignition_headless_cmd = ExecuteProcess(
         cmd=['ign', 'gazebo', '-r', '-s', gazebo_world],
         output='screen',
-        condition=IfCondition(headless),
+        condition=IfCondition(PythonExpression([headless, " or '", gui, "'.lower() != 'true'"])),
     )
 
     # Robot description
@@ -179,6 +196,7 @@ def generate_launch_description():
             declare_robot_name,
             declare_use_sim_time,
             declare_headless,
+            declare_gui,
             declare_skip_robot_state_publisher,
             declare_ros_control_file,
             declare_gazebo_world,
@@ -188,6 +206,8 @@ def generate_launch_description():
             declare_world_init_heading,
             declare_description_path,
             ign_resource_path,
+            ign_plugin_path,
+            gz_plugin_path,
             start_ignition_cmd,
             start_ignition_headless_cmd,
             robot_state_publisher,

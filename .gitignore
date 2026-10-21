@@ -1,0 +1,31 @@
+# Generated workspace directories (including a workspace rooted at this repository).
+build/
+install/
+log/
+logs/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.cache/
+.venv/
+*.bag
+*.db3
+*.mcap
+*.db3-shm
+*.db3-wal
+*.deb
+*.so
+*.so.*
+*.a
+*.o
+*.core
+core
+core.[0-9]*
+*.bak
+*.bak_*
+*~
+.env
+.env.*
+*.pem
+*.key
+# OBJ/MTL, DAE/STL, textures, RViz and YAML are intentionally tracked.

@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+
+<robot name="go2" xmlns:xacro="http://www.ros.org/wiki/xacro">
+    <xacro:include filename="$(find go2_description)/xacro/robot.xacro"/>
+    <xacro:include filename="$(find go2_description)/xacro/mid360.xacro"/>
+
+    <xacro:mid360 parent="trunk" name="mid360"/>
+</robot>

@@ -10,6 +10,11 @@ find_package(champ REQUIRED)
 find_package(champ_msgs REQUIRED)
 find_package(ros_gz_sim REQUIRED)
 find_package(gz_ros2_control REQUIRED)
+find_package(ignition-gazebo6 REQUIRED)
+find_package(ignition-plugin1 REQUIRED COMPONENTS register)
+
+set(IGN_GAZEBO_VER ${ignition-gazebo6_VERSION_MAJOR})
+set(IGN_PLUGIN_VER ${ignition-plugin1_VERSION_MAJOR})
 
 set(dependencies
   rclcpp
@@ -18,6 +23,8 @@ set(dependencies
   champ_msgs
   ros_gz_sim
   gz_ros2_control
+  ignition-gazebo6
+  ignition-plugin1
 )
 
 install(PROGRAMS
@@ -34,6 +41,15 @@ include_directories(
   ${champ_INCLUDE_DIRS}/champ/champ/
 )
 
+add_library(PedestrianPathController SHARED
+  src/pedestrian_path_controller.cpp
+)
+
+target_link_libraries(PedestrianPathController PUBLIC
+  ignition-gazebo${IGN_GAZEBO_VER}::ignition-gazebo${IGN_GAZEBO_VER}
+  ignition-plugin${IGN_PLUGIN_VER}::ignition-plugin${IGN_PLUGIN_VER}
+)
+
 # NOTE: contact_sensor.cpp uses Gazebo Classic APIs and is commented out
 # for Ignition Fortress. A new implementation using Ignition transport
 # would be needed. For now, contact detection can be handled differently.
@@ -45,11 +61,19 @@ include_directories(
 #   contact_sensor
 #     DESTINATION lib/${PROJECT_NAME}
 # )
+install(TARGETS
+  PedestrianPathController
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
+)
+
 install(DIRECTORY launch DESTINATION share/${PROJECT_NAME})
 install(DIRECTORY config DESTINATION share/${PROJECT_NAME})
 install(DIRECTORY worlds DESTINATION share/${PROJECT_NAME})
 
 ament_export_include_directories(include)
+ament_export_libraries(PedestrianPathController)
 ament_export_dependencies(${dependencies})
 
 ament_package()

@@ -1,0 +1,16 @@
+Source: Gazebo Fuel, chapulina / Walking actor, version 2
+URL: https://fuel.gazebosim.org/1.0/chapulina/models/Walking%20actor
+Original file: meshes/walk.dae
+Original SHA256: 49af0df3a319d1cb8ca2cebf02dbd00f625e5d5bec820bc5e109925b18b65c6e
+License: Creative Commons Zero v1.0 Universal
+License URL: https://creativecommons.org/publicdomain/zero/1.0/
+
+Derived files:
+- p1_human_baked.obj
+- p1_human_baked.mtl
+
+Derivation:
+The original animated COLLADA skin was sampled at animation time 1.25 s,
+skinned into a static triangle mesh, centered in X/Y, and shifted so the
+lowest vertex is at local z=0. No skeleton, animation, actor trajectory,
+textures, or Gazebo Classic plugin data are included.

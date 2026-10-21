@@ -1,0 +1,7 @@
+# Optional official source fallback for old diagnostic_updater installations.
+# Tag 4.0.7, BSD-3-Clause. Import from the workspace root into src/.
+repositories:
+  diagnostics:
+    type: git
+    url: https://github.com/ros/diagnostics.git
+    version: a1b95037eeab10592a8268be2a67cadaad6673da

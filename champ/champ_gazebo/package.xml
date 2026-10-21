@@ -16,6 +16,7 @@
   <depend>rclcpp</depend>
   <depend>champ</depend>
   <depend>champ_msgs</depend>
+  <depend>urdf</depend>
   
   <!-- Ignition Fortress / Gazebo dependencies -->
   <exec_depend>ros_gz_sim</exec_depend>
@@ -24,6 +25,8 @@
   <exec_depend>gz_ros2_control</exec_depend>
   <exec_depend>ros2_control</exec_depend>
   <exec_depend>ros2_controllers</exec_depend>
+  <depend>ignition-gazebo6</depend>
+  <depend>ignition-plugin</depend>
   
   <export>
     <build_type>ament_cmake</build_type>

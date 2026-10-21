@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+    <xacro:property name="PI" value="3.1415926535897931"/>
+
+    <xacro:macro name="mid360" params="parent:=trunk name:=mid360">
+        <joint name="${name}_joint" type="fixed">
+            <origin xyz="0.10 0 0.09" rpy="0 0 0"/>
+            <parent link="${parent}"/>
+            <child link="${name}_link"/>
+        </joint>
+
+        <link name="${name}_link">
+            <inertial>
+                <mass value="0.265"/>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <inertia ixx="0.000136" ixy="0" ixz="0"
+                         iyy="0.000136" iyz="0"
+                         izz="0.000162"/>
+            </inertial>
+            <visual>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <cylinder radius="0.035" length="0.050"/>
+                </geometry>
+                <material name="dark_gray">
+                    <color rgba="0.08 0.09 0.10 1"/>
+                </material>
+            </visual>
+            <collision>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <cylinder radius="0.032" length="0.045"/>
+                </geometry>
+            </collision>
+        </link>
+
+        <gazebo reference="${name}_link">
+            <sensor name="${name}_sensor" type="gpu_lidar">
+                <always_on>true</always_on>
+                <visualize>false</visualize>
+                <update_rate>10</update_rate>
+                <topic>/mid360</topic>
+                <ignition_frame_id>${name}_link</ignition_frame_id>
+                <lidar>
+                    <scan>
+                        <horizontal>
+                            <samples>720</samples>
+                            <resolution>1</resolution>
+                            <min_angle>-${PI}</min_angle>
+                            <max_angle>${PI}</max_angle>
+                        </horizontal>
+                        <vertical>
+                            <samples>40</samples>
+                            <resolution>1</resolution>
+                            <min_angle>-0.122173</min_angle>
+                            <max_angle>0.907571</max_angle>
+                        </vertical>
+                    </scan>
+                    <range>
+                        <min>0.10</min>
+                        <max>40.0</max>
+                        <resolution>0.01</resolution>
+                    </range>
+                    <noise>
+                        <type>gaussian</type>
+                        <mean>0.0</mean>
+                        <stddev>0.01</stddev>
+                    </noise>
+                </lidar>
+            </sensor>
+        </gazebo>
+    </xacro:macro>
+</robot>
