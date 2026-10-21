@@ -1,8 +1,6 @@
-> 本地整理版本：源码与验证已完成；GitHub 尚未登录，仓库尚未创建/推送。下列账号自解析克隆命令供登录并建仓后使用。
-
 # 中文复现手册 A–N
 
-仓库：（尚待 GitHub 登录后创建私有仓库并写入真实 URL） 。本手册针对 Ubuntu 22.04 + ROS2 Humble + Ignition Gazebo Fortress；私有仓库要求当前 GitHub 账号有读取权限。终端 A 用于编译和持续运行仿真，终端 B 用于键盘，终端 C 用于只读检查。命令均使用 Bash。
+仓库：https://github.com/Gleaner-Lyf/go2-dynamic-lidar-sim 。本手册针对 Ubuntu 22.04 + ROS2 Humble + Ignition Gazebo Fortress；私有仓库要求当前 GitHub 账号有读取权限。终端 A 用于编译和持续运行仿真，终端 B 用于键盘，终端 C 用于只读检查。命令均使用 Bash。
 
 ## A. 系统与版本检查（终端 A，任意目录）
 
@@ -47,7 +45,7 @@ mkdir -p ~/go2_dynamic_ws/src
 cd ~/go2_dynamic_ws/src
 gh auth login --hostname github.com --web
 gh auth setup-git
-gh repo clone "$(gh api user --jq .login)/go2-dynamic-lidar-sim" go2-dynamic-lidar-sim -- --recurse-submodules
+git clone --recurse-submodules https://github.com/Gleaner-Lyf/go2-dynamic-lidar-sim.git go2-dynamic-lidar-sim
 cd ~/go2_dynamic_ws
 git -C src/go2-dynamic-lidar-sim submodule status
 

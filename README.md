@@ -1,8 +1,6 @@
-> 本地整理版本：源码与验证已完成；GitHub 尚未登录，仓库尚未创建/推送。下列账号自解析克隆命令供登录并建仓后使用。
-
 # Go2 三维动态行人场景与 MID-360 近似雷达仿真
 
-基于 ROS2 Humble、Ignition Gazebo Fortress 和 CHAMP 的 Go2 仿真工程。场景包括地面、边界墙、内部墙、Go2、P1/P2/P3 三个动态行人，以及规则扫描的 MID-360 近似传感器。仓库地址：（尚待 GitHub 登录后创建私有仓库并写入真实 URL） 。本仓库为私有，克隆需要仓库访问权限。
+基于 ROS2 Humble、Ignition Gazebo Fortress 和 CHAMP 的 Go2 仿真工程。场景包括地面、边界墙、内部墙、Go2、P1/P2/P3 三个动态行人，以及规则扫描的 MID-360 近似传感器。仓库地址：https://github.com/Gleaner-Lyf/go2-dynamic-lidar-sim 。本仓库为私有，克隆需要仓库访问权限。
 
 已实测机器人前进、左右转向与停止，三个行人运动、两个关节控制器 active，以及 RViz 机器人和点云显示。当前实现不包含真实 MID-360 非重复扫描轨迹、逐点时间字段或 Unitree L1 仿真。
 
@@ -35,7 +33,7 @@ mkdir -p ~/go2_dynamic_ws/src
 cd ~/go2_dynamic_ws/src
 gh auth login --hostname github.com --web
 gh auth setup-git
-gh repo clone "$(gh api user --jq .login)/go2-dynamic-lidar-sim" go2-dynamic-lidar-sim -- --recurse-submodules
+git clone --recurse-submodules https://github.com/Gleaner-Lyf/go2-dynamic-lidar-sim.git go2-dynamic-lidar-sim
 cd ~/go2_dynamic_ws
 
 # 旧软件源仍提供 diagnostic_updater 4.0.6 时，获取已固定提交的官方源码。
